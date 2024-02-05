@@ -1,72 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Leaflet</title>
 
     <!-- leafletcss -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<style>
-    body{
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <style>
+      body {
         margin: 0;
         padding: 0;
-    }
-    #map{
+      }
+      #map {
         width: 100%;
         height: 100vh;
-    }
-</style>
-</head>
-<body>
+      }
+    </style>
+  </head>
+  <body>
     <div id="map"></div>
-</body>
+  </body>
 </html>
 
 <!-- leaflet js -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+<script src="./data/point.js"></script>
+<script src="./data/line.js"></script>
+<script src="./data/polygon.js"></script>
+
 <script>
-
-//Map intialization?
-    var map = L.map('map').setView([30.3753, 69.3451], 9);
-
-    //osm layer
-  var osm =  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    
-  /*  L.marker([51.5, -0.09]).addTo(map)
-        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
-        .openPopup();*/
-//water-color
-//https://leaflet-extras.github.io/leaflet-providers/preview/
-
-var watercolor = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}', {
-	minZoom: 1,
-	maxZoom: 16,
-	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	ext: 'jpg'
-});
+  //Map intialization?
+  var map = L.map("map").setView([30.3753, 69.3451], 9);
 
 
+                                                    //Tile layer and WMS
 
-//google street map in leaflet
-//https://gis.stackexchange.com/questions/225098/using-google-maps-static-tiles-with-leaflet
+  //osm layer
+  var osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
 
-googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+  //Marker
+
+  /* var myIcon = L.icon({
+        iconUrl: 'img/red-marker.png',
+        iconSize: [90, 90],
+       
+    });*/
+  // , {icon:myIcon}
+
+  var singleMarker = L.marker([30.3753, 69.3451], { draggable: true });
+  var popup = singleMarker
+    .bindPopup("Welcome To Pakistan." + singleMarker.getLatLng())
+    .openPopup();
+  popup.addTo(map);
+
+  var secondMarker = L.marker([31.3753, 70.3451], { draggable: true });
+
+  console.log(singleMarker.toGeoJSON());
+
+  //water-color
+  //https://leaflet-extras.github.io/leaflet-providers/preview/
+
+  var watercolor = L.tileLayer(
+    "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
+    {
+      minZoom: 1,
+      maxZoom: 16,
+      attribution:
+        '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      ext: "jpg",
+    }
+  );
+
+  //google street map in leaflet
+  //https://gis.stackexchange.com/questions/225098/using-google-maps-static-tiles-with-leaflet
+
+  googleStreets = L.tileLayer(
+    "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+    {
+      maxZoom: 20,
+      subdomains: ["mt0", "mt1", "mt2", "mt3"],
+    }
+  );
+  //googleStreets.addTo(map);
+
+  //satellite view
+
+  googleSat = L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
     maxZoom: 20,
-    subdomains:['mt0','mt1','mt2','mt3']
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  });
+  //googleSat.addTo(map);
+
+
+  var nexrad = L.tileLayer.wms("http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", {
+    layers: 'nexrad-n0r-900913',
+    format: 'image/png',
+    transparent: true,
+    attribution: "Weather data © 2012 IEM Nexrad"
 });
-googleStreets.addTo(map);
-
-//satellite view
-
-googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-    maxZoom: 20,
-    subdomains:['mt0','mt1','mt2','mt3']
-});
-googleSat.addTo(map);
 
 
 
+                                            //GEO JSON
+                                            //https://leafletjs.com/reference.html#geojson
+
+  var pointData=L.geoJSON(pointJson).addTo(map);
+
+  var lineData=L.geoJSON(lineJson, {
+    style: {
+      color: "blue", // You can set the color here
+      weight: 3, // Adjust the weight/thickness of the line
+      opacity: 1, // Adjust the opacity of the line
+    },
+  }).addTo(map);
+
+  var polygonData=L.geoJSON(polygonJson, {
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`<b>Name:</b>` + feature.properties.name);
+    },
+    style: {
+      fillColor: "red",
+      fillOpacity: 1,
+      color: "#c0c0c0c0",
+    },
+  }).addTo(map);
+
+                                            //layer controller
+                                            //https://leafletjs.com/examples/layers-control/
+                                            //https://mapshaper.org/
+
+  var baseMaps = {
+    OSM: osm,
+    "Water color map": watercolor,
+    "Google Street": googleStreets,
+    "Google Satellites": googleSat,
+  };
+
+  var overlayMaps = {
+    "First Marker": singleMarker,
+    "Second Marker": secondMarker,
+    'Point Data' :pointData,
+    'Line Data' :lineData,
+    'polygonData' :polygonData,
+    'nexrad':nexrad
+  };
+  //to remove any layer
+  //map.removLayer(name);
+  var layerControl = L.control
+    .layers(baseMaps, overlayMaps, { collapsed: false })
+    .addTo(map);
 </script>
