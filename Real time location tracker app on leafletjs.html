@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Leaflet</title>
+    <title>Real time location tracker app on leafletjs || HTML5 geolocation || Tekson</title>
 
     <!-- leafletcss -->
     <link
@@ -22,10 +22,31 @@
         width: 100%;
         height: 100vh;
       }
+     /*
+      .coordinate{
+        position: absolute;
+        bottom: 10px;
+        right: 40%;
+      }
+      .leaflet-popup-content-wrapper ,.leaflet-popup-tip{
+background-color: #000000;
+color: #fff;
+border: 2px solid red;
+border-radius: 0px;
+
+
+      }
+
+      */
+
+
+
     </style>
   </head>
   <body>
-    <div id="map"></div>
+    <div id="map">
+      <div class="leaflet-control coordinate"></div>
+    </div>
   </body>
 </html>
 
@@ -35,13 +56,14 @@
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
   crossorigin=""
 ></script>
-<script src="./data/point.js"></script>
+
+<!-- <script src="./data/point.js"></script>
 <script src="./data/line.js"></script>
-<script src="./data/polygon.js"></script>
+<script src="./data/polygon.js"></script> -->
 
 <script>
   //Map intialization?
-  var map = L.map("map").setView([30.3753, 69.3451], 9);
+  var map = L.map("map").setView([30.3753, 69.3451], 6);
 
 
                                                     //Tile layer and WMS
@@ -60,7 +82,7 @@
        
     });*/
   // , {icon:myIcon}
-
+/*
   var singleMarker = L.marker([30.3753, 69.3451], { draggable: true });
   var popup = singleMarker
     .bindPopup("Welcome To Pakistan." + singleMarker.getLatLng())
@@ -70,6 +92,7 @@
   var secondMarker = L.marker([31.3753, 70.3451], { draggable: true });
 
   console.log(singleMarker.toGeoJSON());
+  
 
   //water-color
   //https://leaflet-extras.github.io/leaflet-providers/preview/
@@ -163,4 +186,62 @@
   var layerControl = L.control
     .layers(baseMaps, overlayMaps, { collapsed: false })
     .addTo(map);
+
+
+
+                            //LEAFLET EVENTS    https://leafletjs.com/reference.html#map-event
+     map.on('mouseover', function(){
+       console.log('your mouse is over the map');
+                  });       
+map.on('mousemove',function(e){
+document.getElementsByClassName('coordinate')[0].innerHTML = 'lat: ' + e.latlng.lat +'lng:'+e.latlng.lng;
+  console.log('lat: ' + e.latlng.lat,'lng:'+e.latlng.lng);
+})
+
+                          //style Customize
+
+                          */
+
+                          ////////Real time location tracker app on leafletjs || HTML5 geolocation || Tekson
+                          
+                          
+                          if(!navigator.geolocation){
+                            console.log('Your browser does not support geolocation');
+                          }
+                          else
+                          {
+                            setInterval(()=>{
+                              navigator.geolocation.getCurrentPosition(getPosition)
+                          },5000);
+
+                            
+                          }
+
+                          var marker,circle;
+
+
+                          function getPosition(position) {
+                            console.log('position: '+ position)
+                            var lat=position.coords.latitude
+                            var long=position.coords.longitude
+                            var accuracy = position.coords.accuracy
+                            if(marker){
+                              map.removeLayer(marker)
+                            }
+                            
+                            if(circle){
+                              map.removeLayer(circle)
+                            }
+
+                            marker= L.marker([lat, long])
+
+                          circle=L.circle([lat, long],{radius:accuracy})
+
+
+                            var featureGroup= L.featureGroup([marker,circle]).addTo(map)
+                            map.fitBounds(featureGroup.getBounds())
+
+
+                            console.log("Your Cordinate is: Lat:" + lat+ " Long: "+ long + " Accuracy: "+ accuracy)
+                      };
 </script>

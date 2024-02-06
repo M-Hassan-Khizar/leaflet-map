@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaflet Routing Machine || Open Source Routing service || GeoDev</title>
+
+    <!-- leafletcss -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+<!-- LeafLet Routing Machine css 
+https://www.liedman.net/leaflet-routing-machine/-->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+     
+    </style>
+  </head>
+  <body>
+    <div id="map" style="width: 100%; height: 100vh"></div>
+  </body>
+</html>
+
+<!-- leaflet js -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+<!-- LeafLet Routing Machine css 
+https://www.liedman.net/leaflet-routing-machine/-->
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+
+<script>
+  //Map intialization?
+  var map = L.map("map").setView([30.3753, 69.3451], 6);
+
+  // leaflet map with osm layer
+  var tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors"
+}).addTo(map);
+//Marker icon
+var taxiIcon =L.icon({
+iconUrl:'img/taxi.png',
+iconSize:[70,70]
+})
+
+
+
+  //marker
+
+var marker=L.marker([30.3753, 69.3451],{icon:taxiIcon}).addTo(map)
+
+
+//Click on map to chnage second pointer location 
+
+map.on('click',function(e){
+  console.log(e)
+  var secondMarker=L.marker([e.latlng.lat,e.latlng.lng]).addTo(map);
+
+  L.Routing.control({
+  waypoints: [
+    L.latLng(30.3753, 69.3451),
+  L.latLng(e.latlng.lat,e.latlng.lng)
+  ]
+}).on('routesfound',function(e){
+  console.log(e);
+  e.routes[0].coordinates.forEach(function(coord,index){
+    setTimeout(()=>{
+      marker.setLatLng([coord.lat,coord.lng])
+    },100*index);
+  })
+})
+
+
+.addTo(map);
+
+})
+
+//L.Routing.control({
+ // waypoints: [
+   // L.latLng(30.3753, 69.3451),
+    //L.latLng(35.3753, 69.3451)
+  //]
+//}).addTo(map);
+
+
+</script>
