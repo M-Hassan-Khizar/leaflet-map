@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Map print (save as pdf) in leafletjs </title>
+
+    <!-- leafletcss -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <style>
+      #map {
+        width: 100%;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <button onclick="fullScreenView()">View In FUll Screen</button>
+    <!-- https://cdnjs.com/libraries/jquer -->
+    <div class="coordinate"></div>
+    <button class="print-map">Print Map</button>
+  </body>
+</html>
+<!-- Leaflet library -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="./lib/leaflet.browser.print.min.js"></script>
+<script>
+  //Map intialization?
+  var map = L.map("map").setView([30.3753, 69.3451], 6);
+
+  //Tile layer and WMS
+
+  //osm layer
+  var osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+
+  //marker
+
+  var marker = L.marker([30.3753, 69.3451])
+    .addTo(map)
+    .bindPopup("A pretty CSS3 popup.<br>easily customize")
+    .openPopup();
+
+  //add full map scale
+  L.control.scale({ position: "bottomright" }).addTo(map);
+
+  var mapId = document.getElementById("map");
+  function fullScreenView() {
+    mapId.requestFullscreen();
+  }
+
+  //Display Map cordinate
+
+  // Display map coordinate
+  map.on("mousemove", function (e) {
+    $(".coordinate").html(
+      `Lat: ${e.latlng.lat.toFixed(4)}, Lng: ${e.latlng.lng.toFixed(4)}`
+    );
+  });
+
+
+//Print Map function-Button //https://github.com/Igor-Vladyka/leaflet.browser.print
+
+$('.print-map').click(function(){
+  window.print();
+})
+L.control.browserPrint().addTo(map)
+</script>
